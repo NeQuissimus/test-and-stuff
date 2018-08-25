@@ -1,0 +1,32 @@
+comment: off
+coverage:
+  status:
+    project:
+      default: off
+    module1:
+        flags: module1
+        target: auto
+        threshold: 100
+        base: auto
+    module2:
+        flags: module2
+        target: auto
+        threshold: 100
+        base: auto
+    patch:
+      default: off
+      module1:
+        flags: module1
+        threshold: 100
+        base: auto
+      module2:
+        flags: module2
+        threshold: 100
+        base: auto
+flags:
+  module1:
+    paths:
+      - module1/
+  module2:
+    paths:
+      - module2/
