@@ -1,0 +1,33 @@
+language: scala
+scala:
+- 2.12.6
+jdk: openjdk8
+before_install:
+- openssl aes-256-cbc -K $encrypted_e8bae0e20206_key -iv $encrypted_e8bae0e20206_iv
+  -in ./project/zecret -out ./project/secret -d || true
+- git fetch --tags
+env:
+  global:
+  - secure: nF3bEkrCSbVZPdlccXHgGJ+XpWjPHYhjfX+7mC9wUu2kW2D+357mdGopqiF/ATk0hmIaDeFb/Rkj8AD4we9uLAA3Fi5XSlJDlY4yf7YcS6idlEeBJ9w7wq6aLdCy4SGS+yWH5hLs7vqFBvcdKtHxSE2/L33xOoCf7/LxcvXAtoMQXaHoal7cdEYsdggcQMYh46FWb3Pn9yVTbpuaUSF6SNr4b9ucfcj1WkRlIf/vHCBb9dYzddT8SjjgWYv0kyd1Eh0A67dePCdFNe61NXuGQT1Ek1HCJtR7rB9/GXqsahk6KZBFLA2+txPx49G5lZBSSsKIPdrO8DSthjxDUzBb+o0zecPWtAdixDtD40cXMVMxHcJDT/GUnvMUx5RHXhCASncnt6bIWnaTrfEEdW+S/Is8BvX1xxVsTnxOZEEoMK9nvT9kVz/69l7P8MfK3HzW7IsqMNQraVcqz+95m8c7UN3YrofETLAIDaIevKliFWVyN32FoMwnl/fJhYWOzFNzILU3rdJLQq0Yph5r3Ey2NSY8PLbUaMQm2NwpJTF49CfkOkpGsnAmZmdSLAIKg9ZN1GGBwQO++wI2aBv900l5hYkEc/VlJMfLb2xLIMW3skUhkzM/X6RCTAtc6ffoN83163R0OViydup4iaV6kYjVghOKQTuW+79bpUJWYJaQ/LQ=
+  - secure: qMaRakpj6WG/OFOe4oyB77MekubEYu29hbav3fR1+8w3H2o3oG0j2pakubX2isCdEMMVrgHEk58uST6wnHB97b7gj5vvel3WyVST4llZ6O/vVxGOV4ymuMOOyrULo2EAaVYkYFzgXzkEXVAPocuse+IVx8MGmFAIwIhXKUz5pizE4tRY2Boht1orsZ3Xdpvd6bTcTwcgtGGJ+2oHTnxpB7ZR8/qgiSrD5ATKktcOB/nzZFnDFwhptVvWfOWVLUdYf6fCGyRT/5xuRi9F5jdQc1LxO1a4411EnfmYXOX+S0CKOsyIayxIfDYHfOxUbuyijzTsnKy0S5mnDY6erk4vbEY0Yexu5bUVOwx5QhXeGVMVSKuRZ1vtnn8LcDiCV5GlKKIypH+NK1WQhRo8xctZbcLq4+yqJyFA/pkQ/MEUg7sz/Xl8cPcEp9y6pRiSK7lmKwWryReBjR1aOkIzD8PVmmf/V9lvdIkAilaSDMS5XufKhynDivP6KghhZs0OWkCTwfIjVtCX8oGZN57b08IoDnnBgXhzRHHxjiVhv/6FPCsKv4SeHLwVl+hXo/iEIjcJlAxljVt/ILnESRXMLJ/PLf2F/KvNFrRIFMMNe2vteb4qNsQcTAA4G1vj4Y2vkq3aBd2NPWcsBmQuTfXfz0uqGAO/AH7k1vU/AFoYtvvhCAc=
+  - secure: ku8GrnUzNfJsrd3S1E83rySYe0bQQj4nhQHotEDqdw14VJrTt112t1bHZDH3cd8buq+2BDmJiB4463Tzv0lqcgOPp8i1m2A7Ilf+K8w5X7+vRTOl4EeYDIUbehrSClXBAVyjK7HRscjMa2KXWPGI2UZT0VT5eWC4DdOUKGdKIVSGSRFclxjmaAjEkwoN7qMqITMSsqwNzN063VND94f0wlANAxpKemWN2+oYFLF/EGykiIHt7FRtb6ateENRk50z9yZPOyQRV2xgSyl7S5/l7ay9P6ne+jkkyz7jMWWpQqVOWO0wHD2vm1Jy58B0n1lhgxuZNuSaxwltvT2H3I9aYsNuuCywVax/HVztTyOUt36zRSFORh2q8ZJJnBuwCUa8VAxzgZvk58pL7I8WGebMgEmD/86f4rLGzCawyYikz82LkUWDWC0dfrHmrUSS9fqdo9AyAlg8loaD0hPZAo8KuTsql5mN0dbl7u8QUhw2oecEvVfO2nC2ZyS7GrO4Ol+Jxru5rvNpP4TqiCnE3D/TnWoCL7eR1STXqVat8XamjLXTR3kra+X99zgl1V/3ypQmteoAh+cBQRRo1Xahs1JNU4zcrJcNKlpa2AU7A2R0Au1cvIu5pTQjzlAFSSLO2UK0NhcpwGefARyE6NI2A3Tj3mJjowlirnHlNEAYEda+RlI=
+stages:
+- name: build
+- name: release
+  if: (branch = master AND type = push) OR (tag IS present)
+jobs:
+  include:
+    - &build
+      stage: build
+      name: "Build"
+      script: sbt ++$TRAVIS_SCALA_VERSION! coverage test coverageReport
+      after_success: bash <(curl -s https://codecov.io/bash)
+    - &release
+      stage: release
+      name: "Release artifacts"
+      before_script: export PGP_SECRET="$(<./project/secret)"
+      script: sbt ci-release || sbt sonatypeReleaseAll
+
+    - <<: *build
+      scala: 2.11.12
+      name: "Build for 2.11"
