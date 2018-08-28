@@ -83,7 +83,7 @@ Also, for quicker propagation, do the same on http://keyserver.ubuntu.com/
 
 ### Export private key
 
-`$ gpg --armor --export-secret-keys $LONG_ID | base64 -w0 > project/secret`
+`$ gpg --armor --export-secret-keys "${KEY_ID}" | base64 -w0 > project/secret`
 
 Enter the passphrase used when generating the key.
 The key is now Base64-encoded in `project/secret`
